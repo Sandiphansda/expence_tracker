@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
+  <meta name="theme-color" content="#1E3A8A">
+  <title>💰 Desi Expense Tracker | Download + Local Backend</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: system-ui, 'Segoe UI', 'Inter', -apple-system, 'Roboto', sans-serif;
+    }
+
+    body {
+      background: linear-gradient(145deg, #f0f4f8 0%, #e2e8f0 100%);
+      padding: 1.2rem;
+      min-height: 100vh;
+    }
+
+    .app-container {
+      max-width: 720px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 2rem;
+      box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.2);
+      overflow: hidden;
+    }
+
+    /* header */
+    .header {
+      background: linear-gradient(135deg, #0f2b3d, #1e3a5f);
+      padding: 1.5rem 1.5rem 1.2rem;
+      color: white;
+      text-align: center;
+    }
+
+    .header h1 {
+      font-size: 1.9rem;
+      letter-spacing: -0.5px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .header p {
+      font-size: 0.85rem;
+      opacity: 0.9;
+      margin-top: 6px;
+    }
+
+    /* stats cards */
+    .stats-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      padding: 1.5rem;
+      background: white;
+      border-bottom: 1px solid #eef2f6;
+    }
+
+    .stat-card {
+      flex: 1;
+      background: #f9fafb;
+      border-radius: 1.5rem;
+      padding: 1rem 0.8rem;
+      text-align: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+      border: 1px solid #eef2f8;
+    }
+
+    .stat-label {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      color: #4b5563;
+    }
+
+    .stat-amount {
+      font-size: 1.7rem;
+      font-weight: 800;
+      margin-top: 8px;
+      word-break: break-word;
+    }
+
+    .credit-amount { color: #15803d; }
+    .debt-amount { color: #b91c1c; }
+    .net-positive { color: #0f3b2c; }
+    .net-negative { color: #b91c1c; }
+
+    /* form */
+    .form-section {
+      padding: 0 1.5rem 1.5rem 1.5rem;
+      background: white;
+    }
+
+    .form-title {
+      font-weight: 600;
+      margin-bottom: 1rem;
+      font-size: 1.2rem;
+      color: #1e293b;
+    }
+
+    .expense-form {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .form-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .form-group {
+      flex: 1;
+      min-width: 120px;
+    }
+
+    label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: #4b5563;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    input, select, button {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 1.2rem;
+      border: 1px solid #cbd5e1;
+      background: #ffffff;
+      font-size: 0.95rem;
+      transition: 0.2s;
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: #1e3a8a;
+      box-shadow: 0 0 0 3px rgba(30,58,138,0.2);
+    }
+
+    .btn-primary {
+      background: linear-gradient(100deg, #1e3a8a, #2563eb);
+      color: white;
+      border: none;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 5px 12px rgba(37,99,235,0.3);
+    }
+    .btn-primary:active { transform: scale(0.97); }
+
+    .btn-secondary {
+      background: #f1f5f9;
+      color: #1e293b;
+      border: 1px solid #cbd5e1;
+      font-weight: 500;
+    }
+
+    /* History header with download & clear */
+    .history-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 0.8rem 1.5rem 0.2rem 1.5rem;
+      background: white;
+    }
+
+    .history-header h3 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 10px;
+    }
+
+    .download-btn, .clear-btn {
+      background: none;
+      border: none;
+      font-weight: 600;
+      padding: 8px 14px;
+      border-radius: 40px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: 0.1s;
+    }
+
+    .download-btn {
+      background: #e0f2fe;
+      color: #0369a1;
+    }
+    .clear-btn {
+      background: #fee2e2;
+      color: #dc2626;
+    }
+
+    /* transactions list */
+    .transactions-list {
+      padding: 1rem 1.2rem 1.8rem;
+      max-height: 440px;
+      overflow-y: auto;
+      background: white;
+    }
+
+    .transaction-item {
+      background: #fefefe;
+      border-radius: 1.2rem;
+      padding: 12px 14px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-left: 5px solid;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+
+    .transaction-credit { border-left-color: #16a34a; }
+    .transaction-debt { border-left-color: #dc2626; }
+
+    .trans-details { flex: 3; }
+    .trans-desc {
+      font-weight: 600;
+      font-size: 1rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: baseline;
+    }
+    .trans-date {
+      font-size: 0.7rem;
+      color: #6b7280;
+      background: #f1f5f9;
+      padding: 2px 8px;
+      border-radius: 40px;
+    }
+    .trans-type {
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 2px 10px;
+      border-radius: 30px;
+      background: #eef2ff;
+    }
+    .trans-amount {
+      font-weight: 800;
+      font-size: 1.2rem;
+      margin-right: 12px;
+      min-width: 95px;
+      text-align: right;
+    }
+    .credit-amount-text { color: #15803d; }
+    .debt-amount-text { color: #b91c1c; }
+    .delete-btn {
+      background: transparent;
+      border: none;
+      font-size: 1.4rem;
+      cursor: pointer;
+      padding: 5px;
+      width: 40px;
+      border-radius: 50%;
+      color: #9ca3af;
+    }
+    .delete-btn:active { background: #fee2e2; color: #dc2626; }
+    .empty-msg { text-align: center; padding: 2rem; color: #6c757d; font-style: italic; }
+
+    /* apk guide */
+    .apk-guide {
+      background: #f1f5f9;
+      margin: 0 1rem 1.2rem 1rem;
+      padding: 0.8rem;
+      border-radius: 1.2rem;
+      font-size: 0.75rem;
+      text-align: center;
+      color: #334155;
+      border: 1px dashed #94a3b8;
+    }
+    .apk-guide a {
+      color: #1e3a8a;
+      font-weight: bold;
+      text-decoration: none;
+    }
+    footer {
+      text-align: center;
+      font-size: 0.7rem;
+      color: #6c757d;
+      padding: 0.8rem;
+      border-top: 1px solid #e9ecef;
+      background: white;
+    }
+    @media (max-width: 550px) {
+      .stats-grid { flex-direction: column; gap: 0.6rem; }
+      .transaction-item { flex-wrap: wrap; gap: 8px; }
+      .trans-amount { text-align: left; }
+    }
+  </style>
+</head>
+<body>
+<div class="app-container">
+  <div class="header">
+    <h1>📊 Desi Expense Tracker</h1>
+    <p>Credit + Debt | ₹ Indian Rupee | Local Storage Backend</p>
+  </div>
+
+  <!-- Stats: total credit, debt, net -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-label">📈 TOTAL CREDIT</div>
+      <div class="stat-amount credit-amount" id="totalCredit">₹ 0</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">📉 TOTAL DEBT</div>
+      <div class="stat-amount debt-amount" id="totalDebt">₹ 0</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">⚖️ NET BALANCE</div>
+      <div class="stat-amount" id="netAmount">₹ 0</div>
+    </div>
+  </div>
+
+  <!-- Add transaction form -->
+  <div class="form-section">
+    <div class="form-title">➕ Add Daily Entry</div>
+    <div class="expense-form">
+      <div class="form-row">
+        <div class="form-group">
+          <label>📅 Date</label>
+          <input type="date" id="transactionDate" required>
+        </div>
+        <div class="form-group">
+          <label>📌 Description</label>
+          <input type="text" id="description" placeholder="e.g., Grocery, Salary, EMI" autocomplete="off">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>💰 Amount (₹)</label>
+          <input type="number" id="amount" placeholder="0.00" step="0.01" min="0.01">
+        </div>
+        <div class="form-group">
+          <label>🔁 Type</label>
+          <select id="transType">
+            <option value="credit">💵 Credit (Income)</option>
+            <option value="debt">💸 Debt (Expense)</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn-primary" id="addTransactionBtn">➕ Add Transaction</button>
+    </div>
+  </div>
+
+  <!-- History header with download & clear -->
+  <div class="history-header">
+    <h3>📜 Transaction History</h3>
+    <div class="action-buttons">
+      <button class="download-btn" id="downloadCsvBtn">📎 Download CSV</button>
+      <button class="clear-btn" id="clearAllBtn">🗑️ Clear All</button>
+    </div>
+  </div>
+
+  <!-- Transactions list container -->
+  <div class="transactions-list" id="transactionsList">
+    <div class="empty-msg">✨ No entries yet. Add your first credit or expense!</div>
+  </div>
+
+  <!-- APK generation guide (local backend + apk instructions) -->
+  <div class="apk-guide">
+    📱 <strong>Local Backend (IndexedDB/locale storage)</strong> • Data stays on your device.<br>
+    🧩 <strong>Get APK:</strong> Save this page as HTML → use <a href="https://www.pwabuilder.com" target="_blank">PWABuilder</a> or <a href="https://www.web2apk.com/" target="_blank">Web2APK</a> → Generate APK. <br>
+    ✅ <strong>Download expense list</strong> as CSV file for offline records.
+  </div>
+  <footer>
+    🇮🇳 ₹ Indian Rupee • All data stored in browser localStorage (local backend) • Export anytime
+  </footer>
+</div>
+
+<script>
+  // ----------  LOCAL BACKEND (localStorage) ----------
+  let transactions = [];   // each: { id, date, description, amount, type }
+
+  // DOM elements
+  const totalCreditEl = document.getElementById('totalCredit');
+  const totalDebtEl = document.getElementById('totalDebt');
+  const netAmountEl = document.getElementById('netAmount');
+  const transactionsListEl = document.getElementById('transactionsList');
+  const addBtn = document.getElementById('addTransactionBtn');
+  const clearAllBtn = document.getElementById('clearAllBtn');
+  const downloadCsvBtn = document.getElementById('downloadCsvBtn');
+  const dateInput = document.getElementById('transactionDate');
+  const descInput = document.getElementById('description');
+  const amountInput = document.getElementById('amount');
+  const typeSelect = document.getElementById('transType');
+
+  // Helper: format INR currency (Indian Rupee)
+  const formatINR = (amount) => {
+    return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(amount);
+  };
+
+  // Save to localStorage (local backend)
+  const saveToLocalStorage = () => {
+    localStorage.setItem('expenseTrackerData_V2', JSON.stringify(transactions));
+  };
+
+  // Load from localStorage
+  const loadTransactions = () => {
+    const stored = localStorage.getItem('expenseTrackerData_V2');
+    if (stored) {
+      transactions = JSON.parse(stored);
+    } else {
+      // Sample demo entries (Indian context)
+      transactions = [
+        {
+          id: Date.now() + 101,
+          date: new Date().toISOString().slice(0,10),
+          description: "Freelance project",
+          amount: 8500,
+          type: "credit"
+        },
+        {
+          id: Date.now() + 102,
+          date: new Date().toISOString().slice(0,10),
+          description: "Grocery & vegetables",
+          amount: 1250,
+          type: "debt"
+        },
+        {
+          id: Date.now() + 103,
+          date: new Date(Date.now() - 2 * 86400000).toISOString().slice(0,10),
+          description: "Electricity bill",
+          amount: 890,
+          type: "debt"
+        }
+      ];
+      saveToLocalStorage();
+    }
+  };
+
+  // Calculate totals
+  const calculateTotals = () => {
+    let totalCredit = 0, totalDebt = 0;
+    transactions.forEach(t => {
+      if (t.type === 'credit') totalCredit += t.amount;
+      else if (t.type === 'debt') totalDebt += t.amount;
+    });
+    const net = totalCredit - totalDebt;
+    return { totalCredit, totalDebt, net };
+  };
+
+  // Update stats UI
+  const updateStats = () => {
+    const { totalCredit, totalDebt, net } = calculateTotals();
+    totalCreditEl.innerText = formatINR(totalCredit);
+    totalDebtEl.innerText = formatINR(totalDebt);
+    netAmountEl.innerText = formatINR(net);
+    netAmountEl.style.color = net >= 0 ? "#15803d" : "#b91c1c";
+  };
+
+  // Render transactions list
+  const renderTransactions = () => {
+    if (!transactionsListEl) return;
+    if (transactions.length === 0) {
+      transactionsListEl.innerHTML = `<div class="empty-msg">📭 No expense entries. Click 'Add Transaction' to start.</div>`;
+      updateStats();
+      return;
+    }
+
+    const sorted = [...transactions].sort((a,b) => new Date(b.date) - new Date(a.date));
+    let html = '';
+    sorted.forEach(trans => {
+      const isCredit = trans.type === 'credit';
+      const amountFormatted = formatINR(trans.amount);
+      const amountClass = isCredit ? 'credit-amount-text' : 'debt-amount-text';
+      const sign = isCredit ? '+' : '−';
+      const displayAmount = `${sign} ${amountFormatted}`;
+      const typeLabel = isCredit ? '💚 Credit' : '❤️ Debt';
+      const borderClass = isCredit ? 'transaction-credit' : 'transaction-debt';
+
+      let displayDate = trans.date;
+      if (trans.date && trans.date.includes('-')) {
+        const parts = trans.date.split('-');
+        if (parts.length === 3) displayDate = `${parts[2]}/${parts[1]}/${parts[0]}`;
+      }
+
+      html += `
+        <div class="transaction-item ${borderClass}" data-id="${trans.id}">
+          <div class="trans-details">
+            <div class="trans-desc">
+              <strong>${escapeHtml(trans.description)}</strong>
+              <span class="trans-date">📅 ${displayDate}</span>
+              <span class="trans-type">${typeLabel}</span>
+            </div>
+          </div>
+          <div class="trans-amount ${amountClass}">${displayAmount}</div>
+          <button class="delete-btn" data-id="${trans.id}" aria-label="delete">🗑️</button>
+        </div>
+      `;
+    });
+    transactionsListEl.innerHTML = html;
+
+    // attach delete events
+    document.querySelectorAll('.delete-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const id = parseInt(btn.getAttribute('data-id'));
+        deleteTransactionById(id);
+      });
+    });
+    updateStats();
+  };
+
+  const escapeHtml = (text) => {
+    if (!text) return '';
+    return text.replace(/[&<>]/g, function(m) {
+      if (m === '&') return '&amp;';
+      if (m === '<') return '&lt;';
+      if (m === '>') return '&gt;';
+      return m;
+    });
+  };
+
+  // Add transaction
+  const addTransaction = () => {
+    let dateVal = dateInput.value;
+    const descriptionVal = descInput.value.trim();
+    let amountVal = parseFloat(amountInput.value);
+    const typeVal = typeSelect.value;
+
+    if (!dateVal) {
+      alert("❌ Please select a date.");
+      return;
+    }
+    if (descriptionVal === "") {
+      alert("📝 Please add a description (e.g., Grocery, Salary).");
+      return;
+    }
+    if (isNaN(amountVal) || amountVal <= 0) {
+      alert("💰 Amount must be a positive number (greater than 0).");
+      return;
+    }
+
+    const newTransaction = {
+      id: Date.now(),
+      date: dateVal,
+      description: descriptionVal,
+      amount: amountVal,
+      type: typeVal,
+    };
+
+    transactions.push(newTransaction);
+    saveToLocalStorage();
+    renderTransactions();
+
+    // Reset description & amount; keep date for convenience
+    descInput.value = '';
+    amountInput.value = '';
+    descInput.focus();
+  };
+
+  // Delete single transaction
+  const deleteTransactionById = (id) => {
+    transactions = transactions.filter(t => t.id !== id);
+    saveToLocalStorage();
+    renderTransactions();
+  };
+
+  // Clear all data
+  const clearAllTransactions = () => {
+    if (transactions.length === 0) return;
+    const confirmClear = confirm("⚠️ PERMANENT DELETE: All credit & debt history will be removed. Continue?");
+    if (confirmClear) {
+      transactions = [];
+      saveToLocalStorage();
+      renderTransactions();
+    }
+  };
+
+  // ---------- DOWNLOAD EXPENSE LIST (CSV) ----------
+  const downloadExpenseListAsCSV = () => {
+    if (transactions.length === 0) {
+      alert("📭 No transactions to download. Add some expenses or credits first.");
+      return;
+    }
+
+    // Prepare data rows: Date, Description, Type, Amount (in ₹), Amount (numeric)
+    const headers = ["Date (YYYY-MM-DD)", "Description", "Type", "Amount (INR)", "Amount (Numeric)", "Currency"];
+    const rows = transactions.map(t => {
+      const typeLabel = t.type === "credit" ? "Credit / Income" : "Debt / Expense";
+      const amountInr = formatINR(t.amount);   // ₹ X,XXX.XX
+      return [
+        t.date,
+        `"${t.description.replace(/"/g, '""')}"`,  // escape quotes for CSV
+        typeLabel,
+        amountInr,
+        t.amount,
+        "INR"
+      ];
+    });
+
+    const csvContent = [headers, ...rows].map(row => row.join(",")).join("\n");
+    // BOM for proper UTF-8 & Indian currency symbol display
+    const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    link.href = url;
+    const today = new Date().toISOString().slice(0,19).replace(/:/g, '-');
+    link.setAttribute("download", `expense_history_${today}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  // optional: also JSON download (advanced) but we keep CSV as main download
+  // but to give more flexibility you can add JSON download, but user request "download expence list"
+  // we can also add JSON hidden? but CSV is perfect.
+
+  // Set default date to today
+  const setDefaultDate = () => {
+    const today = new Date().toISOString().slice(0,10);
+    if (!dateInput.value) dateInput.value = today;
+  };
+
+  // initialization and event binding
+  const init = () => {
+    loadTransactions();
+    renderTransactions();
+    setDefaultDate();
+
+    addBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      addTransaction();
+    });
+
+    clearAllBtn.addEventListener('click', () => clearAllTransactions());
+    downloadCsvBtn.addEventListener('click', () => downloadExpenseListAsCSV());
+
+    // keyboard: press enter on any field adds transaction
+    const formInputs = [descInput, amountInput, dateInput];
+    formInputs.forEach(input => {
+      if (input) {
+        input.addEventListener('keypress', (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            addTransaction();
+          }
+        });
+      }
+    });
+  };
+
+  // start app
+  init();
+</script>
+</body>
+</html>
